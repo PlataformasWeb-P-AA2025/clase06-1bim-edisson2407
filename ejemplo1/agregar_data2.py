@@ -1,30 +1,24 @@
-from sqlalchemy.orm import sessionmaker
+import pandas as pd
 
-from crear_base import Saludo
+from sqlalchemy.orm import sessionmaker
+from crear_base import Saludo2
 from configuracion import engine
 
+# Crear sesión
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# se crea un objeto de tipo
-# Saludo
+# Leer el CSV con separador '|'
+df = pd.read_csv('/home/edisson/Documentos/web/sem06/clase06-1bim-edisson2407/ejemplo1/data/saludos_mundo.csv', sep='|')
 
-miSaludo = Saludo()
-miSaludo.mensaje = "Hola que tal"
-miSaludo.tipo = "informal"
+# Insertar los datos en la base
+for _, fila in df.iterrows():
+    saludo = Saludo2()
+    saludo.mensaje = fila['saludo']
+    saludo.tipo = fila['tipo']
+    saludo.origen = fila['origen']
+    session.add(saludo)
 
-miSaludo2 = Saludo()
-miSaludo2.mensaje = "Buenas tardes"
-miSaludo2.tipo = "formal"
-
-
-# se agrega el objeto miSaludo
-# a la entidad Saludo a la sesión
-# a la espera de un commit
-# para agregar un registro a la base de
-# datos demobase.db
-session.add(miSaludo)
-session.add(miSaludo2)
-
-# se confirma las transacciones
+# Confirmar
 session.commit()
+
